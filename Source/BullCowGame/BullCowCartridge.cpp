@@ -1,9 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "BullCowCartridge.h"
+#include "HiddenWordList.h"
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
+
+    IsogramList = GetValidWords(HiddenWordList);
+
+    PrintLine(TEXT("Isogram List Length: %d"), IsogramList.Num());
 
     InitGame();
 }
@@ -65,6 +70,25 @@ void UBullCowCartridge::ProcessGuess(const FString& Input) {
     }
 }
 
-bool UBullCowCartridge::IsIsogram(const FString& Input) {
-    return false;
+bool UBullCowCartridge::IsIsogram(const FString& Input) const {
+    for (int32 i = 0; i < Input.Len(); i++) {
+        for (int32 j = i + 1; j < Input.Len(); j++) {
+            if (Input[i] == Input[j]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+TArray<FString> UBullCowCartridge::GetValidWords(const TArray<FString>& WordList) {
+    TArray<FString> Isograms;
+
+    for(auto Word : WordList) {
+        if (Word.Len() >= 4 && Word.Len() <= 8 && IsIsogram(Word)) {
+            Isograms.Emplace(Word);
+        }
+    }
+
+    return Isograms;
 }
